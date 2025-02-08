@@ -11,7 +11,7 @@ export const dataSourceOptions: DataSourceOptions = {
   database: process.env.DB_NAME || 'ecommerce',
   entities: [path.join(__dirname, '/../**/*.entity{.ts,.js}')],
   migrations: [path.join(__dirname, '/../migrations/*{.ts,.js}')],
-  synchronize: process.env.NODE_ENV !== 'development',
+  synchronize: false,
   logging: process.env.DB_LOGGING === 'true',
 };
 
