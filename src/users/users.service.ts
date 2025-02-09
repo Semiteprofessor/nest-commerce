@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +12,7 @@ import { UserEntity } from './entities/user.entity';
 import { UserSignUpDto } from './dto/user-signup.dto';
 import * as bcrypt from 'bcryptjs';
 import { UserSignInDto } from './dto/user-signin.dto';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class UsersService {
@@ -16,7 +22,9 @@ export class UsersService {
   ) {}
 
   async signUp(userSignUpDto: UserSignUpDto): Promise<UserEntity> {
-    const existingUser = await this.findUserByEmail(userSignUpDto.email);
+    const existingUser = await this.usersRepository.findOneBy({
+      email: userSignUpDto.email,
+    });
     if (existingUser) {
       throw new BadRequestException('Email already exists');
     }
@@ -31,17 +39,39 @@ export class UsersService {
   }
 
   async signIn(userSignInDto: UserSignInDto): Promise<UserEntity> {
-    const user = await this.findUserByEmail(userSignInDto.email);
-    if (!user) {
-      throw new BadRequestException('Invalid email or password');
+    const { email, password } = userSignInDto;
+
+    if (!email || !password) {
+      throw new BadRequestException('Email and password are required');
     }
 
-    const isPasswordValid = await bcrypt.compare(
-      userSignInDto.password,
-      user.password,
-    );
+    const user = await this.usersRepository.findOne({
+      where: { email: email },
+    });
+
+    console.log('User from DB:', user);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    if (!user.password) {
+      throw new InternalServerErrorException(
+        'User password is missing in database',
+      );
+    }
+
+    if (!password) {
+      throw new BadRequestException('Password is required');
+    }
+
+    console.log('User password from DB:', user.password);
+    console.log('Password from request:', password);
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
     if (!isPasswordValid) {
-      throw new BadRequestException('Invalid email or password');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     return user;
@@ -51,8 +81,8 @@ export class UsersService {
     return 'This action adds a new user';
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll() {
+    return await this.usersRepository.find();
   }
 
   findOne(id: number) {
@@ -69,5 +99,13 @@ export class UsersService {
 
   async findUserByEmail(email: string): Promise<UserEntity | null> {
     return this.usersRepository.findOne({ where: { email } });
+  }
+
+  accessToken(user: UserEntity): string {
+    return jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET as string,
+      { expiresIn: '1d' },
+    );
   }
 }

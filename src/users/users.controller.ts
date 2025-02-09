@@ -24,8 +24,14 @@ export class UsersController {
   }
 
   @Post('signin')
-  async signIn(@Body() userSignInDto: UserSignInDto): Promise<UserEntity> {
-    return await this.usersService.signIn(userSignInDto);
+  async signIn(@Body() userSignInDto: UserSignInDto): Promise<{
+    user: UserEntity;
+    accessToken: string;
+  }> {
+    const user = await this.usersService.signIn(userSignInDto);
+    const accessToken = await this.usersService.accessToken(user);
+
+    return { user, accessToken };
   }
 
   @Post()
@@ -34,8 +40,8 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll(): Promise<UserEntity[]> {
+    return await this.usersService.findAll();
   }
 
   @Get(':id')
