@@ -2,7 +2,7 @@
   "name": "ecommerce",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "Taiwo Olapade",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -18,11 +18,11 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "typeorm": "npm run build && npx typeorm -d dist/db/data-source.js",
-    "migration:generate": "npm run typeorm --migration:generate",
-    "migration:run": "npm run typeorm --migration:run",
-    "migration:revert": "npm run typeorm --migration:revert",
-    "db:drop": "npm run typeorm schema:drop"
+    "typeorm": "pnpm run build && npx typeorm -d dist/db/data-source.js",
+    "migration:generate": "pnpm run typeorm -- migration:generate",
+    "migration:run": "pnpm run typeorm -- migration:run",
+    "migration:revert": "pnpm run typeorm -- migration:revert",
+    "db:drop": "pnpm run typeorm schema:drop"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.8",
@@ -30,11 +30,12 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^11.0.8",
     "@nestjs/typeorm": "^11.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
     "dotenv": "^16.4.7",
     "pg": "^8.13.1",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1",
-    "typeorm": "^0.3.20"
+    "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -60,6 +61,7 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "typeorm": "^0.3.20",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.23.0"
   },

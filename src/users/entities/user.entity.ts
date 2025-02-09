@@ -13,6 +13,6 @@ export class UserEntity {
   password: string;
   @Column({ type: 'enum', enum: Roles, array: true, default: [Roles.USER] })
   role: string;
-  @Column({ default: false })
-  isActive: boolean;
+  //   @Column({ default: false })
+  //   isActive: boolean;
 }
