@@ -1,5 +1,10 @@
 import { Roles } from 'src/utiltiy/common/user-roles.enum';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('users')
 export class UserEntity {
@@ -9,10 +14,14 @@ export class UserEntity {
   name: string;
   @Column()
   email: string;
-  @Column()
+  @Column({ select: false })
   password: string;
   @Column({ type: 'enum', enum: Roles, array: true, default: [Roles.USER] })
-  role: string;
+  role: Roles[];
+  @CreateDateColumn()
+  createdAt: Date;
+  @CreateDateColumn()
+  updatedAt: Date;
   //   @Column({ default: false })
   //   isActive: boolean;
 }

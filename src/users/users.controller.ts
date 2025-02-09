@@ -10,16 +10,16 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserSignUp } from './dto/user-signup.dto';
+import { UserSignUpDto } from './dto/user-signup.dto';
+import { UserEntity } from './entities/user.entity';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('signup')
-  async signUp(@Body() body: UserSignUp) {
-    await this.usersService.signUp(body);
-    return 'User signed up successfully';
+  async signUp(@Body() userSignUpDto: UserSignUpDto): Promise<UserEntity> {
+    return await this.usersService.signUp(userSignUpDto);
   }
 
   @Post()
