@@ -39,13 +39,13 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Get()
+  @Get('all')
   async findAll(): Promise<UserEntity[]> {
     return await this.usersService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get('single/:id')
+  findOne(@Param('id') id: number): Promise<UserEntity> {
     return this.usersService.findOne(+id);
   }
 
