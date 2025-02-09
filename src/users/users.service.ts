@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
 import { UserSignUpDto } from './dto/user-signup.dto';
 import * as bcrypt from 'bcryptjs';
+import { UserSignInDto } from './dto/user-signin.dto';
 
 @Injectable()
 export class UsersService {
@@ -27,6 +28,23 @@ export class UsersService {
     });
 
     return await this.usersRepository.save(user);
+  }
+
+  async signIn(userSignInDto: UserSignInDto): Promise<UserEntity> {
+    const user = await this.findUserByEmail(userSignInDto.email);
+    if (!user) {
+      throw new BadRequestException('Invalid email or password');
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      userSignInDto.password,
+      user.password,
+    );
+    if (!isPasswordValid) {
+      throw new BadRequestException('Invalid email or password');
+    }
+
+    return user;
   }
 
   create(createUserDto: CreateUserDto) {
