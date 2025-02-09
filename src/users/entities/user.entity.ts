@@ -18,10 +18,10 @@ export class UserEntity {
   password: string;
   @Column({ type: 'enum', enum: Roles, array: true, default: [Roles.USER] })
   role: Roles[];
-  @CreateDateColumn()
-  createdAt: Date;
-  @CreateDateColumn()
-  updatedAt: Date;
+  // @CreateDateColumn()
+  // createdAt: Date;
+  // @CreateDateColumn()
+  // updatedAt: Date;
   //   @Column({ default: false })
   //   isActive: boolean;
 }

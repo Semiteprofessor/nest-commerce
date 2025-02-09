@@ -5,12 +5,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
 import { UserSignUpDto } from './dto/user-signup.dto';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
-    private usersRepository: Repository<UserEntity>,
+    private readonly usersRepository: Repository<UserEntity>,
   ) {}
 
   async signUp(userSignUpDto: UserSignUpDto): Promise<UserEntity> {
@@ -18,9 +19,16 @@ export class UsersService {
     if (existingUser) {
       throw new BadRequestException('Email already exists');
     }
-    const user = this.usersRepository.create(userSignUpDto);
+
+    const hashedPassword = await bcrypt.hash(userSignUpDto.password, 10);
+    const user = this.usersRepository.create({
+      ...userSignUpDto,
+      password: hashedPassword,
+    });
+
     return await this.usersRepository.save(user);
   }
+
   create(createUserDto: CreateUserDto) {
     return 'This action adds a new user';
   }
@@ -41,7 +49,7 @@ export class UsersService {
     return `This action removes a #${id} user`;
   }
 
-  async findUserByEmail(email: string) {
-    return await this.usersRepository.findOneBy({ email });
+  async findUserByEmail(email: string): Promise<UserEntity | null> {
+    return this.usersRepository.findOne({ where: { email } });
   }
 }
